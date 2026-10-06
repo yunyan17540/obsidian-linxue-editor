@@ -1,7 +1,7 @@
 {
   "id": "linxue-editor",
-  "name": "AI智能陪写系统",
-  "version": "0.1.1",
+  "name": "Linxue",
+  "version": "0.1.2",
   "minAppVersion": "1.5.0",
   "description": "读取当前文稿，让可改名的编辑指出不足，并用你自己的语音接口朗读。",
   "author": "yunyan17540",
