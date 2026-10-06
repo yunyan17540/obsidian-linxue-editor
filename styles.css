@@ -1,0 +1,84 @@
+.linxue-view {
+  padding: 12px 14px 24px;
+  user-select: text;
+}
+
+.linxue-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.linxue-toolbar select,
+.linxue-toolbar button {
+  height: 30px;
+}
+
+.linxue-status {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+
+.linxue-body {
+  line-height: 1.7;
+  white-space: normal;
+}
+
+.linxue-history {
+  margin-top: 22px;
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: 8px;
+}
+
+.linxue-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.linxue-history-head h3 {
+  margin: 8px 0;
+}
+
+.linxue-history-empty {
+  color: var(--text-muted);
+}
+
+.linxue-history-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.linxue-history-open {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linxue-view .setting-item {
+  border-top: none;
+}
+
+.linxue-savebar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px 0;
+  background: var(--background-primary);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.linxue-save-status {
+  color: var(--text-muted);
+}

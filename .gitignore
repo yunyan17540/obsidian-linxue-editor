@@ -1,0 +1,9 @@
+node_modules/
+*.map
+.DS_Store
+data.json
+history.json
+settings-screen.png
+linxue-editor-*.zip
+
+linxue-editor-0.1.0.zip

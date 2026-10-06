@@ -1,0 +1,20 @@
+{
+  "name": "obsidian-linxue-editor",
+  "version": "0.1.0",
+  "description": "Obsidian plugin that reviews the current note aloud with a renameable writing companion.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "check": "tsc --noEmit --pretty false",
+    "test": "node --experimental-strip-types --test tests/text-util.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "builtin-modules": "^4.0.0",
+    "esbuild": "^0.25.5",
+    "obsidian": "^1.8.7",
+    "typescript": "^5.8.3"
+  }
+}

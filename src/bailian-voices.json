@@ -1,0 +1,345 @@
+[
+  {
+    "title": "qwen-audio-3.1-tts-flash",
+    "voices": [
+      {
+        "id": "longanhuan_v3.1",
+        "name": "龙安欢_v3.1"
+      },
+      {
+        "id": "longanlingxin_v3.1",
+        "name": "龙安灵心_v3.1"
+      },
+      {
+        "id": "longanfengyue_v3.1",
+        "name": "龙安风悦_v3.1"
+      },
+      {
+        "id": "xunanchuan_v3.1",
+        "name": "许南川"
+      },
+      {
+        "id": "yuxiaoyun_v3.1",
+        "name": "于小云"
+      },
+      {
+        "id": "qiaoxiaojiao_v3.1",
+        "name": "乔小娇"
+      },
+      {
+        "id": "xiaxiaochen_v3.1",
+        "name": "夏小晨"
+      },
+      {
+        "id": "anmingyuan_v3.1",
+        "name": "安明远"
+      },
+      {
+        "id": "wenhuaiqing_v3.1",
+        "name": "温怀清"
+      },
+      {
+        "id": "anxiaolan_v3.1",
+        "name": "安小岚"
+      },
+      {
+        "id": "xieshurou_v3.1",
+        "name": "谢舒柔"
+      },
+      {
+        "id": "baiqinglan_v3.1",
+        "name": "白清岚"
+      },
+      {
+        "id": "xuyuyuan_v3.1",
+        "name": "许玉远"
+      },
+      {
+        "id": "anruorou_v3.1",
+        "name": "安若柔"
+      },
+      {
+        "id": "wenhuaizhi_v3.1",
+        "name": "闻怀之"
+      },
+      {
+        "id": "xiaoxingzhi_v3.1",
+        "name": "萧行之"
+      },
+      {
+        "id": "guyunshu_v3.1",
+        "name": "顾云舒"
+      },
+      {
+        "id": "huozhuoshi_v3.1",
+        "name": "霍拙石"
+      },
+      {
+        "id": "yeqinghe_v3.1",
+        "name": "叶清禾"
+      },
+      {
+        "id": "yunhuanhuan_v3.1",
+        "name": "云欢欢"
+      },
+      {
+        "id": "xuxiaoqiao_v3.1",
+        "name": "徐小俏"
+      },
+      {
+        "id": "baianran_v3.1",
+        "name": "白安然"
+      },
+      {
+        "id": "xuyanchu_v3.1",
+        "name": "许言初"
+      },
+      {
+        "id": "yezhiqing_v3.1",
+        "name": "叶知晴"
+      },
+      {
+        "id": "andi_v3.1",
+        "name": "安迪"
+      },
+      {
+        "id": "anyuqing_v3.1",
+        "name": "安语晴"
+      },
+      {
+        "id": "Emily_v3.1",
+        "name": "Emily"
+      },
+      {
+        "id": "Luna_v3.1",
+        "name": "Luna"
+      },
+      {
+        "id": "Eric_v3.1",
+        "name": "Eric"
+      },
+      {
+        "id": "Luca_v3.1",
+        "name": "Luca"
+      },
+      {
+        "id": "Abby_v3.1",
+        "name": "Abby"
+      },
+      {
+        "id": "Annie_v3.1",
+        "name": "Annie"
+      },
+      {
+        "id": "Ava_v3.1",
+        "name": "Ava"
+      },
+      {
+        "id": "Beth_v3.1",
+        "name": "Beth"
+      },
+      {
+        "id": "Betty_v3.1",
+        "name": "Betty"
+      },
+      {
+        "id": "Cally_v3.1",
+        "name": "Cally"
+      },
+      {
+        "id": "Cindy_v3.1",
+        "name": "Cindy"
+      },
+      {
+        "id": "Donna_v3.1",
+        "name": "Donna"
+      },
+      {
+        "id": "Andy_v3.1",
+        "name": "Andy"
+      },
+      {
+        "id": "Brian_v3.1",
+        "name": "Brian"
+      },
+      {
+        "id": "David_v3.1",
+        "name": "David"
+      },
+      {
+        "id": "longanyuanfei_v3.1",
+        "name": "龙安元妃_v3.1"
+      },
+      {
+        "id": "longjielidou_v3.1",
+        "name": "龙杰力豆_v3.1"
+      },
+      {
+        "id": "longanlingxi_v3.1",
+        "name": "龙安灵希_v3.1"
+      },
+      {
+        "id": "longhuohuo_v3.1",
+        "name": "龙火火_v3.1"
+      },
+      {
+        "id": "longyingtao_v3.1",
+        "name": "龙应桃_v3.1"
+      },
+      {
+        "id": "longanya_v3.1",
+        "name": "龙安雅_v3.1"
+      },
+      {
+        "id": "longwan_v3.1",
+        "name": "龙婉_v3.1"
+      },
+      {
+        "id": "longxing_v3.1",
+        "name": "龙星_v3.1"
+      },
+      {
+        "id": "longhua_v3.1",
+        "name": "龙华_v3.1"
+      },
+      {
+        "id": "longhan_v3.1",
+        "name": "龙寒_v3.1"
+      },
+      {
+        "id": "longanzhi_v3.1",
+        "name": "龙安智_v3.1"
+      },
+      {
+        "id": "longzhe_v3.1",
+        "name": "龙哲_v3.1"
+      },
+      {
+        "id": "longanyang_v3.1",
+        "name": "龙安洋_v3.1"
+      },
+      {
+        "id": "libai_v3.1",
+        "name": "李白_v3.1"
+      },
+      {
+        "id": "longling_v3.1",
+        "name": "龙铃_v3.1"
+      },
+      {
+        "id": "longniuniu_v3.1",
+        "name": "龙牛牛_v3.1"
+      },
+      {
+        "id": "longshanshan_v3.1",
+        "name": "龙闪闪_v3.1"
+      },
+      {
+        "id": "longpaopao_v3.1",
+        "name": "龙泡泡_v3.1"
+      },
+      {
+        "id": "loongstella_v3.1",
+        "name": "loongstella_v3.1"
+      },
+      {
+        "id": "longyuan_v3.1",
+        "name": "龙媛_v3.1"
+      },
+      {
+        "id": "longmiao_v3.1",
+        "name": "龙妙_v3.1"
+      },
+      {
+        "id": "longsanshu_v3.1",
+        "name": "龙三叔_v3.1"
+      },
+      {
+        "id": "longanli_v3.1",
+        "name": "龙安莉_v3.1"
+      },
+      {
+        "id": "longanwen_v3.1",
+        "name": "龙安温_v3.1"
+      },
+      {
+        "id": "longanlang_v3.1",
+        "name": "龙安朗_v3.1"
+      },
+      {
+        "id": "longxiaoxia_v3.1",
+        "name": "龙小夏_v3.1"
+      },
+      {
+        "id": "longanchong_v3.1",
+        "name": "龙安冲_v3.1"
+      }
+    ]
+  },
+  {
+    "title": "qwen-audio-3.0-tts-plus",
+    "voices": [
+      {
+        "id": "longanlingxin",
+        "name": "龙安灵心"
+      },
+      {
+        "id": "longanlufeng",
+        "name": "龙安鲁风"
+      }
+    ]
+  },
+  {
+    "title": "qwen-audio-3.0-tts-flash",
+    "voices": [
+      {
+        "id": "longanfengyue",
+        "name": "龙安风悦"
+      },
+      {
+        "id": "longanyuanfei",
+        "name": "龙安元妃"
+      },
+      {
+        "id": "longanlingxi",
+        "name": "龙安灵希"
+      },
+      {
+        "id": "longanxiaoxin",
+        "name": "龙安小昕"
+      },
+      {
+        "id": "longanhuan_v3.6",
+        "name": "龙安欢"
+      },
+      {
+        "id": "longjielidou_v3.6",
+        "name": "龙杰力豆"
+      },
+      {
+        "id": "longpaopao_v3.6",
+        "name": "龙泡泡"
+      },
+      {
+        "id": "longhuohuo_v3.6",
+        "name": "龙火火"
+      },
+      {
+        "id": "longchuanshu_v3.6",
+        "name": "龙川叔"
+      },
+      {
+        "id": "loongmary",
+        "name": "loongmary"
+      },
+      {
+        "id": "loongeva_v3.6",
+        "name": "loongeva"
+      },
+      {
+        "id": "loongjohn",
+        "name": "loongJohn"
+      }
+    ]
+  }
+]
