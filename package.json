@@ -1,6 +1,6 @@
 {
   "name": "obsidian-linxue-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Obsidian plugin that reviews the current note aloud with a renameable writing companion.",
   "private": true,
   "type": "module",

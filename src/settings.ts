@@ -52,7 +52,6 @@ export class LinxueSettingTab extends PluginSettingTab {
   private render(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "AI智能陪写系统" });
     containerEl.createEl("p", {
       text: "点评走文本接口，朗读走语音接口。填写后点页面底部的「保存」，密钥才会写入本库。不连接本地模型。",
     });

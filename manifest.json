@@ -1,9 +1,9 @@
 {
   "id": "linxue-editor",
   "name": "AI智能陪写系统",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.5.0",
-  "description": "边写边听的陪写插件。它读取当前文稿，让可改名的编辑身份指出不足，并用你的语音接口朗读。说话可在话痨、淑女安静、中庸之间切换。",
+  "description": "读取当前文稿，让可改名的编辑指出不足，并用你自己的语音接口朗读。",
   "author": "yunyan17540",
   "authorUrl": "https://github.com/yunyan17540",
   "isDesktopOnly": false

@@ -20,7 +20,7 @@ npm test
 npm run build
 ```
 
-也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.0.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
+也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.1.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
 
 - `main.js`
 - `manifest.json`
