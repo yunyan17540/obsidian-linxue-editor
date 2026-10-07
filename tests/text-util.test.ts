@@ -128,6 +128,19 @@ test("identity prompt keeps the chosen name, address, and shared story", () => {
   assert.match(prompt, /你是编辑/);
 });
 
+test("occupation is stated ahead of the role text", () => {
+  const prompt = buildIdentityPrompt({
+    name: "林雪",
+    occupation: "律师",
+    userAddress: "",
+    background: "",
+    sharedStory: "",
+    persona: "按律师的方式回答。",
+  });
+  assert.match(prompt, /你的职业是律师/);
+  assert.ok(prompt.indexOf("你的职业是律师") < prompt.indexOf("按律师的方式回答"));
+});
+
 test("added text ignores unchanged surroundings", () => {
   const spans = addedSpans("甲乙丙", "甲新增乙丙");
   assert.equal(spans.map((span) => span.text).join(""), "新增");

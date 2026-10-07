@@ -5,12 +5,15 @@ export function displayName(name: string): string {
   return trimmed || DEFAULT_AI_NAME;
 }
 
-export type IdentityId = "editor" | "programmer";
+export type BuiltinIdentity = "editor" | "programmer";
 
-export const IDENTITY_LABEL: Record<IdentityId, string> = {
-  editor: "小说编辑",
-  programmer: "程序员",
-};
+export interface IdentityProfile {
+  id: string;
+  label: string;
+  occupation: string;
+  persona: string;
+  builtin?: BuiltinIdentity;
+}
 
 export function personaWithName(persona: string, name: string): string {
   return buildIdentityPrompt({ persona, name, userAddress: "", background: "", sharedStory: "" });
@@ -19,6 +22,7 @@ export function personaWithName(persona: string, name: string): string {
 export function buildIdentityPrompt(input: {
   persona: string;
   name: string;
+  occupation?: string;
   userAddress: string;
   background: string;
   sharedStory: string;
@@ -29,6 +33,7 @@ export function buildIdentityPrompt(input: {
     `你的名字是${who}。界面、状态和语音里都用这个名字自称。如果下文里写了别的名字，以「${who}」为准。`,
     `你称呼对方为「${address}」，不要改口。`,
   ];
+  if (input.occupation?.trim()) lines.push(`你的职业是${input.occupation.trim()}。若下文写了别的职业，以这个为准。`);
   if (input.background.trim()) lines.push(`你的背景经历以此为准：${input.background.trim()}`);
   if (input.sharedStory.trim()) lines.push(`你们之间的故事以此为准；若与下文冲突，以这段为准：${input.sharedStory.trim()}`);
   lines.push(input.persona.trim());
@@ -93,6 +98,14 @@ export const DEFAULT_PROGRAMMER_PERSONA = `从现在开始，请你扮演一名�
 export const SPEECH_STYLE = `这次回复会被语音朗读。请用适合朗读的口语，句子不要太长。不要使用 Markdown 标题、表格、星号、代码块或难读符号。示例若有必要，用“比如”口头带过，并保持很短。不要替我重写整章。`;
 
 export type ReviewMode = "chatty" | "quiet" | "balanced";
+
+export function reviewModes(): ReviewMode[] {
+  return ["chatty", "quiet", "balanced"];
+}
+
+export function isReviewMode(value: string): value is ReviewMode {
+  return value === "chatty" || value === "quiet" || value === "balanced";
+}
 
 export const MODE_LABEL: Record<ReviewMode, string> = {
   chatty: "话痨",

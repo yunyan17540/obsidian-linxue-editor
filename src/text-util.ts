@@ -33,11 +33,17 @@ export function addRecord(records: ReviewRecord[], record: ReviewRecord): Review
   return [record, ...records.filter((item) => item.id !== record.id)].slice(0, HISTORY_LIMIT);
 }
 
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 export function parseHistory(raw: string): ReviewRecord[] {
   try {
-    const parsed = JSON.parse(raw) as { records?: unknown };
-    if (!Array.isArray(parsed.records)) return [];
-    return parsed.records.filter(isRecord).slice(0, HISTORY_LIMIT);
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed)) return [];
+    const records = parsed["records"];
+    if (!Array.isArray(records)) return [];
+    return records.filter(isReviewRecord).slice(0, HISTORY_LIMIT);
   } catch {
     return [];
   }
@@ -63,15 +69,20 @@ export function historyTitle(record: ReviewRecord): string {
   return `${historyStamp(record.createdAt)} · ${record.title} · ${MODE_TEXT[record.mode]} · ${scope}`;
 }
 
-function isRecord(value: unknown): value is ReviewRecord {
-  if (!value || typeof value !== "object") return false;
-  const row = value as Partial<ReviewRecord>;
-  return typeof row.id === "string"
-    && typeof row.createdAt === "number"
-    && typeof row.title === "string"
-    && typeof row.reply === "string"
-    && (row.scope === "document" || row.scope === "selection")
-    && (row.mode === "chatty" || row.mode === "quiet" || row.mode === "balanced");
+function isReviewRecord(value: unknown): value is ReviewRecord {
+  if (!isRecord(value)) return false;
+  const id = value["id"];
+  const createdAt = value["createdAt"];
+  const title = value["title"];
+  const reply = value["reply"];
+  const scope = value["scope"];
+  const mode = value["mode"];
+  return typeof id === "string"
+    && typeof createdAt === "number"
+    && typeof title === "string"
+    && typeof reply === "string"
+    && (scope === "document" || scope === "selection")
+    && (mode === "chatty" || mode === "quiet" || mode === "balanced");
 }
 
 export function joinUrl(base: string, path: string): string {
@@ -222,23 +233,22 @@ export function userMessage(doc: ReviewDocument, name: string): string {
 }
 
 export function extractChatContent(payload: unknown): string {
-  if (!payload || typeof payload !== "object") return "";
-  const choices = (payload as { choices?: unknown }).choices;
-  if (!Array.isArray(choices) || choices.length === 0) return "";
-  const message = (choices[0] as { message?: { content?: unknown } }).message;
-  const content = message?.content;
+  if (!isRecord(payload)) return "";
+  const choices = payload["choices"];
+  if (!Array.isArray(choices) || !isRecord(choices[0])) return "";
+  const message = choices[0]["message"];
+  if (!isRecord(message)) return "";
+  const content = message["content"];
   if (typeof content === "string") return content.trim();
   if (!Array.isArray(content)) return "";
-  return content
-    .map((part) => {
-      if (typeof part === "string") return part;
-      if (part && typeof part === "object" && "text" in part && typeof part.text === "string") {
-        return part.text;
-      }
-      return "";
-    })
-    .join("")
-    .trim();
+  return content.map(textFromPart).join("").trim();
+}
+
+function textFromPart(part: unknown): string {
+  if (typeof part === "string") return part;
+  if (!isRecord(part)) return "";
+  const text = part["text"];
+  return typeof text === "string" ? text : "";
 }
 
 export function toSpeechText(source: string): string {
@@ -311,8 +321,8 @@ export function getByPath(payload: unknown, path: string): unknown {
   const parts = path.split(".").map((part) => part.trim()).filter(Boolean);
   let current: unknown = payload;
   for (const part of parts) {
-    if (!current || typeof current !== "object" || !(part in current)) return undefined;
-    current = (current as Record<string, unknown>)[part];
+    if (!isRecord(current) || !(part in current)) return undefined;
+    current = current[part];
   }
   return current;
 }
@@ -384,17 +394,17 @@ export function speechCatalogBase(provider: "openai" | "custom", baseUrl: string
 
 function modelId(item: unknown): string {
   if (typeof item === "string") return item.trim();
-  if (!item || typeof item !== "object") return "";
-  const id = (item as { id?: unknown }).id;
+  if (!isRecord(item)) return "";
+  const id = item["id"];
   return typeof id === "string" ? id.trim() : "";
 }
 
 function voiceId(item: unknown): string {
   if (typeof item === "string") return item.trim();
-  if (!item || typeof item !== "object") return "";
-  const row = item as Record<string, unknown>;
+  if (!isRecord(item)) return "";
   for (const key of ["voice", "voice_id", "id", "name", "voice_name"]) {
-    if (typeof row[key] === "string" && row[key].trim()) return row[key].trim();
+    const value = item[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
   }
   return "";
 }

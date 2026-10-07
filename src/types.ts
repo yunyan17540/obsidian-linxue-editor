@@ -1,4 +1,4 @@
-import type { IdentityId, ReviewMode } from "./persona";
+import type { IdentityProfile, ReviewMode } from "./persona";
 import type { ReviewRecord } from "./text-util";
 
 export type SpeechProvider = "openai" | "custom";
@@ -11,7 +11,8 @@ export interface LinxueSettings {
   userAddress: string;
   background: string;
   sharedStory: string;
-  identity: IdentityId;
+  identity: string;
+  identities: IdentityProfile[];
   editorPersona: string;
   programmerPersona: string;
   mode: ReviewMode;

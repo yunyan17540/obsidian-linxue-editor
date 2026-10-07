@@ -1,6 +1,8 @@
-# AI智能陪写系统
+# Linxue
 
-Obsidian 第三方插件。它读取当前正在写的笔记，把内容发给你自己的文本接口，再把陪写身份的点评交给语音接口朗读。
+Linxue reads the note you are writing, sends it to a text API you configure, and speaks the reply through a speech API you configure. There is no bundled local model. The companion can be renamed. Built-in identities are a novel editor and a programmer, and you can add your own occupation and prompt. When little new text appears, auto review asks whether you are stuck.
+
+界面里的产品名是 AI智能陪写系统。它读取当前正在写的笔记，把内容发给你自己的文本接口，再把陪写身份的点评交给语音接口朗读。
 
 默认身份叫林雪，是青梅竹马，也是编辑。设置里的「AI身份名称」可以改成别的名字，面板标题、状态栏、右键菜单、提示和语音都会跟着改。她会说明自己理解了什么、哪里真正成立，再指出不足和可以动手的改法。三种说话模式：
 
@@ -20,7 +22,7 @@ npm test
 npm run build
 ```
 
-也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.3.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
+也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.4.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
 
 - `main.js`
 - `manifest.json`
@@ -64,7 +66,7 @@ npm run build
 
 「AI人设」里可以填写她怎么称呼你、她自己的背景经历，以及你们两人的故事。称呼留空时用「你」。经历和故事留空时，沿用当前身份原稿。填写后会附加到点评、润色、续写和卡文问候里；故事若和原稿冲突，以你填写的为准。
 
-身份可以在「小说编辑」和「程序员」之间切换。两边各自保存系统提示词，切换不会清掉称呼、经历和故事。命令「切换身份」做同一件事。「恢复当前身份」只恢复正在使用的那一份原稿。
+身份列表自带「小说编辑」和「程序员」，也可以点「新增」自己添加。每份身份单独保存名称、职业和系统提示词。职业会写进提示词，并优先于原稿里的职业。切换不会清掉称呼、经历和故事。命令「切换身份」按列表轮换。「恢复」只作用于两份自带身份；自定义身份可以删除。
 
 ## 使用
 

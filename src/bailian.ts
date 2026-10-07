@@ -1,5 +1,9 @@
 import catalog from "./bailian-voices.json" with { type: "json" };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 export interface BailianVoice {
   id: string;
   name: string;
@@ -10,7 +14,7 @@ export interface BailianVoiceGroup {
   voices: BailianVoice[];
 }
 
-export const BAILIAN_VOICE_GROUPS = catalog as BailianVoiceGroup[];
+export const BAILIAN_VOICE_GROUPS = readVoiceGroups(catalog);
 
 export const BAILIAN_TTS_MODELS = BAILIAN_VOICE_GROUPS.map((group) => group.title);
 
@@ -39,20 +43,35 @@ export function bailianFormat(format: string): "mp3" | "wav" | "opus" {
 }
 
 export function bailianAudioUrl(payload: unknown): string {
-  if (!payload || typeof payload !== "object") return "";
-  const output = (payload as { output?: unknown }).output;
+  if (!isRecord(payload)) return "";
+  const output = payload["output"];
   const sources = [output, payload];
   for (const source of sources) {
-    if (!source || typeof source !== "object") continue;
-    const row = source as Record<string, unknown>;
-    const audio = row.audio;
-    if (audio && typeof audio === "object") {
-      const url = (audio as { url?: unknown }).url;
+    if (!isRecord(source)) continue;
+    const audio = source["audio"];
+    if (isRecord(audio)) {
+      const url = audio["url"];
       if (typeof url === "string" && url.trim()) return url.trim();
     }
     for (const key of ["audio_url", "url"]) {
-      if (typeof row[key] === "string" && /^https?:\/\//.test(row[key])) return row[key].trim();
+      const value = source[key];
+      if (typeof value === "string" && /^https?:\/\//.test(value)) return value.trim();
     }
   }
   return "";
+}
+
+function readVoiceGroups(value: unknown): BailianVoiceGroup[] {
+  if (!Array.isArray(value)) return [];
+  const groups: BailianVoiceGroup[] = [];
+  for (const group of value) {
+    if (!isRecord(group) || typeof group["title"] !== "string" || !Array.isArray(group["voices"])) continue;
+    const voices: BailianVoice[] = [];
+    for (const voice of group["voices"]) {
+      if (!isRecord(voice) || typeof voice["id"] !== "string" || typeof voice["name"] !== "string") continue;
+      voices.push({ id: voice["id"], name: voice["name"] });
+    }
+    groups.push({ title: group["title"], voices });
+  }
+  return groups;
 }

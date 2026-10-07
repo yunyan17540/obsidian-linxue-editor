@@ -41,6 +41,7 @@ function identityPrompt(settings: LinxueSettings): string {
   return buildIdentityPrompt({
     persona: settings.persona,
     name: settings.aiName,
+    occupation: settings.identities.find((item) => item.id === settings.identity)?.occupation ?? "",
     userAddress: settings.userAddress,
     background: settings.background,
     sharedStory: settings.sharedStory,

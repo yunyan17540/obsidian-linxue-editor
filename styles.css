@@ -33,14 +33,9 @@
   padding-top: 8px;
 }
 
-.linxue-history-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.linxue-history-head h3 {
-  margin: 8px 0;
+.linxue-history .setting-item.mod-heading {
+  border: none;
+  padding-top: 8px;
 }
 
 .linxue-history-empty {
