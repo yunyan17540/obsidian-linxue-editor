@@ -1,10 +1,16 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import { BAILIAN_TTS_MODELS, isBailianSpeechUrl, voicesForModel } from "./bailian";
-import { DEFAULT_AI_NAME, DEFAULT_PERSONA, MODE_HINT, MODE_LABEL, type ReviewMode } from "./persona";
+import { DEFAULT_AI_NAME, DEFAULT_PERSONA, DEFAULT_PROGRAMMER_PERSONA, IDENTITY_LABEL, MODE_HINT, MODE_LABEL, type IdentityId, type ReviewMode } from "./persona";
 import type { LinxueHost, LinxueSettings, SpeechCatalog } from "./types";
 
 export const DEFAULT_SETTINGS: LinxueSettings = {
   aiName: DEFAULT_AI_NAME,
+  userAddress: "",
+  background: "",
+  sharedStory: "",
+  identity: "editor",
+  editorPersona: DEFAULT_PERSONA,
+  programmerPersona: DEFAULT_PROGRAMMER_PERSONA,
   mode: "balanced",
   persona: DEFAULT_PERSONA,
   textBaseUrl: "https://api.openai.com/v1",
@@ -34,6 +40,15 @@ export const DEFAULT_SETTINGS: LinxueSettings = {
   autoReview: false,
   autoReviewMinutes: 15,
 };
+
+export function normalizeIdentity(settings: LinxueSettings): void {
+  if (settings.identity !== "editor" && settings.identity !== "programmer") settings.identity = "editor";
+  if (!settings.aiName?.trim()) settings.aiName = DEFAULT_AI_NAME;
+  if (!settings.editorPersona?.trim()) settings.editorPersona = settings.persona?.trim() || DEFAULT_PERSONA;
+  if (!settings.programmerPersona?.trim()) settings.programmerPersona = DEFAULT_PROGRAMMER_PERSONA;
+  const active = settings.identity === "programmer" ? settings.programmerPersona : settings.editorPersona;
+  settings.persona = active.trim() ? active : settings.identity === "programmer" ? DEFAULT_PROGRAMMER_PERSONA : DEFAULT_PERSONA;
+}
 
 export class LinxueSettingTab extends PluginSettingTab {
   private draft: LinxueSettings = { ...DEFAULT_SETTINGS };
@@ -84,6 +99,14 @@ export class LinxueSettingTab extends PluginSettingTab {
       .addText((text) => {
         text.setPlaceholder(DEFAULT_AI_NAME).setValue(this.draft.aiName).onChange((value) => {
           this.draft.aiName = value.trim();
+        });
+      });
+    new Setting(containerEl)
+      .setName("对你的称呼")
+      .setDesc("她说话时怎么叫你。留空则用「你」。")
+      .addText((text) => {
+        text.setPlaceholder("你").setValue(this.draft.userAddress).onChange((value) => {
+          this.draft.userAddress = value.trim();
         });
       });
   }
@@ -276,15 +299,56 @@ export class LinxueSettingTab extends PluginSettingTab {
 
   private personaSetting(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "AI人设" });
-    this.areaField(containerEl, "系统提示词", "persona", "模式要求会附加在这段后面，一般不用改模式段落。", 16);
     new Setting(containerEl)
-      .setName("恢复默认人设")
+      .setName("身份")
+      .setDesc("在小说编辑和程序员之间切换。两边各自记住修改，称呼、背景和你们的故事不会被换掉。")
+      .addDropdown((dropdown) => {
+        (Object.keys(IDENTITY_LABEL) as IdentityId[]).forEach((identity) => {
+          dropdown.addOption(identity, IDENTITY_LABEL[identity]);
+        });
+        dropdown.setValue(this.draft.identity).onChange((value) => {
+          this.applyIdentity(value as IdentityId);
+        });
+      });
+    this.areaField(containerEl, "背景经历", "background", "她自己的经历。留空则只用当前身份原稿里的经历。", 5);
+    this.areaField(containerEl, "两人的故事", "sharedStory", "填写后，若和身份原稿冲突，以这里为准。", 5);
+    new Setting(containerEl)
+      .setName("系统提示词")
+      .setDesc("当前身份的工作方式。说话模式会附加在这段后面。")
+      .addTextArea((area) => {
+        area.setValue(this.draft.persona).onChange((value) => {
+          this.draft.persona = value;
+          this.storeActivePersona(value);
+        });
+        area.inputEl.rows = 16;
+        area.inputEl.addClass("linxue-wide-input");
+      });
+    new Setting(containerEl)
+      .setName("恢复当前身份")
+      .setDesc("只恢复正在使用的这一份原稿，另一份身份和上面的称呼、经历、故事不动。")
       .addButton((button) => {
         button.setButtonText("恢复").onClick(() => {
-          this.draft.persona = DEFAULT_PERSONA;
+          const source = this.draft.identity === "programmer" ? DEFAULT_PROGRAMMER_PERSONA : DEFAULT_PERSONA;
+          this.draft.persona = source;
+          this.storeActivePersona(source);
           this.render();
         });
       });
+  }
+
+  private applyIdentity(next: IdentityId): void {
+    this.storeActivePersona(this.draft.persona);
+    this.draft.identity = next;
+    const stored = next === "programmer" ? this.draft.programmerPersona : this.draft.editorPersona;
+    const fallback = next === "programmer" ? DEFAULT_PROGRAMMER_PERSONA : DEFAULT_PERSONA;
+    this.draft.persona = stored.trim() ? stored : fallback;
+    this.storeActivePersona(this.draft.persona);
+    this.render();
+  }
+
+  private storeActivePersona(value: string): void {
+    if (this.draft.identity === "programmer") this.draft.programmerPersona = value;
+    else this.draft.editorPersona = value;
   }
 
   private textField(
@@ -300,7 +364,7 @@ export class LinxueSettingTab extends PluginSettingTab {
         text.setValue(String(this.draft[key] ?? "")).onChange((value) => {
           this.assign(key, value.trim());
         });
-        text.inputEl.style.width = "100%";
+        text.inputEl.addClass("linxue-wide-input");
       });
   }
 
@@ -373,7 +437,7 @@ export class LinxueSettingTab extends PluginSettingTab {
           this.assign(key, value);
         });
         area.inputEl.rows = rows;
-        area.inputEl.style.width = "100%";
+        area.inputEl.addClass("linxue-wide-input");
       });
   }
 
@@ -385,12 +449,10 @@ export class LinxueSettingTab extends PluginSettingTab {
     paint();
     const button = bar.createEl("button", { text: "保存", cls: "mod-cta" });
     button.addEventListener("click", () => {
-      void this.persist()
-        .then(() => {
-          paint();
-          new Notice("陪写设置已保存");
-        })
-        .catch((error: unknown) => new Notice(errorText(error)));
+      this.persist().then(() => {
+        paint();
+        new Notice("陪写设置已保存");
+      }, (error: unknown) => new Notice(errorText(error)));
     });
     containerEl.addEventListener("input", () => paint());
     containerEl.addEventListener("change", () => paint());

@@ -1,5 +1,5 @@
 import { requestUrl } from "obsidian";
-import { SPEECH_STYLE, concernInstruction, continueInstruction, displayName, modeInstruction, personaWithName, polishInstruction, temperatureFor } from "./persona";
+import { SPEECH_STYLE, buildIdentityPrompt, concernInstruction, continueInstruction, displayName, modeInstruction, polishInstruction, temperatureFor } from "./persona";
 import type { LinxueSettings, ReviewDocument } from "./types";
 import { bailianAudioUrl, bailianFormat, bailianSpeechUrl, isBailianSpeechUrl, voicesForModel, BAILIAN_TTS_MODELS } from "./bailian";
 import type { SpeechCatalog } from "./types";
@@ -37,6 +37,16 @@ function authHeaders(apiKey: string, extraRaw: string): Record<string, string> {
   return headers;
 }
 
+function identityPrompt(settings: LinxueSettings): string {
+  return buildIdentityPrompt({
+    persona: settings.persona,
+    name: settings.aiName,
+    userAddress: settings.userAddress,
+    background: settings.background,
+    sharedStory: settings.sharedStory,
+  });
+}
+
 export async function requestReview(settings: LinxueSettings, doc: ReviewDocument): Promise<string> {
   if (!settings.textBaseUrl.trim() || !settings.textModel.trim()) {
     throw new Error("请先在设置里填写文本接口地址和模型名");
@@ -48,7 +58,7 @@ export async function requestReview(settings: LinxueSettings, doc: ReviewDocumen
     messages: [
       {
         role: "system",
-        content: `${personaWithName(settings.persona, settings.aiName)}\n\n${SPEECH_STYLE}\n\n${modeInstruction(settings.mode)}`,
+        content: `${identityPrompt(settings)}\n\n${SPEECH_STYLE}\n\n${modeInstruction(settings.mode)}`,
       },
       { role: "user", content: userMessage(doc, displayName(settings.aiName)) },
     ],
@@ -81,7 +91,7 @@ async function requestWriting(settings: LinxueSettings, system: string, user: st
       model: settings.textModel.trim(),
       temperature,
       messages: [
-        { role: "system", content: `${personaWithName(settings.persona, settings.aiName)}\n\n${system}` },
+        { role: "system", content: `${identityPrompt(settings)}\n\n${system}` },
         { role: "user", content: user },
       ],
     }),

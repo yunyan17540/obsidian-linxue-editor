@@ -42,18 +42,28 @@ export class LinxueView extends ItemView {
       this.modeEl.value = this.host.settings.mode;
       this.modeEl.addEventListener("change", () => {
         this.host.settings.mode = (this.modeEl?.value || "balanced") as ReviewMode;
-        void this.host.saveSettings();
+        this.host.saveSettings().catch((error: unknown) => {
+          this.setStatus(error instanceof Error ? error.message : "模式没有保存");
+        });
       });
     }
 
     const review = bar.createEl("button", { text: "点评全文", cls: "mod-cta" });
-    review.addEventListener("click", () => void this.host.review("document"));
+    review.addEventListener("click", () => {
+      this.host.review("document").catch((error: unknown) => this.fail(error));
+    });
     const selection = bar.createEl("button", { text: "点评选区" });
-    selection.addEventListener("click", () => void this.host.review("selection"));
+    selection.addEventListener("click", () => {
+      this.host.review("selection").catch((error: unknown) => this.fail(error));
+    });
     const polish = bar.createEl("button", { text: "润色选区" });
-    polish.addEventListener("click", () => void this.host.polishSelection());
+    polish.addEventListener("click", () => {
+      this.host.polishSelection().catch((error: unknown) => this.fail(error));
+    });
     const writing = bar.createEl("button", { text: "替我续写" });
-    writing.addEventListener("click", () => void this.host.continueWriting());
+    writing.addEventListener("click", () => {
+      this.host.continueWriting().catch((error: unknown) => this.fail(error));
+    });
     const stop = bar.createEl("button", { text: "停止" });
     stop.addEventListener("click", () => this.host.stopSpeaking());
 
@@ -63,9 +73,15 @@ export class LinxueView extends ItemView {
     const heading = history.createDiv({ cls: "linxue-history-head" });
     heading.createEl("h3", { text: "点评历史" });
     const clear = heading.createEl("button", { text: "清空" });
-    clear.addEventListener("click", () => void this.host.clearHistory());
+    clear.addEventListener("click", () => {
+      this.host.clearHistory().catch((error: unknown) => this.fail(error));
+    });
     this.historyEl = history.createDiv({ cls: "linxue-history-list" });
     this.renderHistory();
+  }
+
+  private fail(error: unknown): void {
+    this.setStatus(error instanceof Error ? error.message : "操作没有完成");
   }
 
   setStatus(text: string): void {
@@ -94,10 +110,18 @@ export class LinxueView extends ItemView {
       const row = this.historyEl.createDiv({ cls: "linxue-history-row" });
       const open = row.createEl("button", { cls: "linxue-history-open", text: historyTitle(record) });
       open.title = record.excerpt ? `当时的文字：${record.excerpt}` : record.path;
-      open.addEventListener("click", () => void this.host.openHistory(record.id));
+      open.addEventListener("click", () => {
+        this.host.openHistory(record.id).catch((error: unknown) => this.fail(error));
+      });
       const remove = row.createEl("button", { cls: "linxue-history-delete", text: "删除" });
-      remove.addEventListener("click", () => void this.host.deleteHistory(record.id));
+      remove.addEventListener("click", () => {
+        this.host.deleteHistory(record.id).catch((error: unknown) => this.fail(error));
+      });
     }
+  }
+
+  clearTranscript(): void {
+    this.bodyEl?.empty();
   }
 
   async setTranscript(markdown: string): Promise<void> {

@@ -1,7 +1,7 @@
 import { MarkdownView, Notice, Plugin, WorkspaceLeaf, normalizePath } from "obsidian";
 import { detectSpeechCatalog, pingText, requestConcern, requestContinue, requestPolish, requestReview, requestSpeech } from "./api";
-import { MODE_LABEL, displayName } from "./persona";
-import { DEFAULT_SETTINGS, LinxueSettingTab } from "./settings";
+import { DEFAULT_PERSONA, DEFAULT_PROGRAMMER_PERSONA, MODE_LABEL, displayName, type IdentityId } from "./persona";
+import { DEFAULT_SETTINGS, LinxueSettingTab, normalizeIdentity } from "./settings";
 import { Speaker } from "./speaker";
 import { addedSpans, addRecord, buildReviewDocument, chunkForSpeech, createRecord, meaningfulLength, parseHistory, toSpeechText, type ReviewRecord } from "./text-util";
 import type { LinxueSettings, ReviewScope, SpeechCatalog } from "./types";
@@ -32,27 +32,37 @@ export default class LinxuePlugin extends Plugin {
     await this.loadSettings();
     this.registerView(VIEW_TYPE, (leaf) => new LinxueView(leaf, this));
     this.addSettingTab(new LinxueSettingTab(this.app, this));
-    this.ribbon = this.addRibbonIcon("audio-lines", `${this.who}点评当前文稿`, () => void this.review("document"));
+    this.ribbon = this.addRibbonIcon("audio-lines", `${this.who}点评当前文稿`, () => {
+      this.review("document").catch((error: unknown) => this.showFailure(error, "点评没有完成"));
+    });
 
     this.addCommand({
       id: "review-document",
       name: "点评当前文稿并朗读",
-      callback: () => void this.review("document"),
+      callback: () => {
+        this.review("document").catch((error: unknown) => this.showFailure(error, "点评没有完成"));
+      },
     });
     this.addCommand({
       id: "review-selection",
       name: "点评选中文字并朗读",
-      callback: () => void this.review("selection"),
+      callback: () => {
+        this.review("selection").catch((error: unknown) => this.showFailure(error, "点评没有完成"));
+      },
     });
     this.addCommand({
       id: "polish-selection",
       name: "请求润色选中文字",
-      callback: () => void this.polishSelection(),
+      callback: () => {
+        this.polishSelection().catch((error: unknown) => this.showFailure(error, "润色没有完成"));
+      },
     });
     this.addCommand({
       id: "continue-writing",
       name: "请求替我续写",
-      callback: () => void this.continueWriting(),
+      callback: () => {
+        this.continueWriting().catch((error: unknown) => this.showFailure(error, "续写没有完成"));
+      },
     });
     this.addCommand({
       id: "stop-speech",
@@ -62,25 +72,42 @@ export default class LinxuePlugin extends Plugin {
     this.addCommand({
       id: "cycle-mode",
       name: "切换说话模式",
-      callback: () => void this.cycleMode(),
+      callback: () => {
+        this.cycleMode().catch((error: unknown) => this.showFailure(error, "模式没有切换"));
+      },
+    });
+    this.addCommand({
+      id: "cycle-identity",
+      name: "切换身份",
+      callback: () => {
+        this.cycleIdentity().catch((error: unknown) => this.showFailure(error, "身份没有切换"));
+      },
     });
     this.addCommand({
       id: "reload-plugin",
       name: "重新加载陪写插件",
-      callback: () => void this.reloadSelf(),
+      callback: () => {
+        this.reloadSelf().catch((error: unknown) => this.showFailure(error, "插件没有重新加载"));
+      },
     });
 
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor) => {
         if (!editor.getSelection()) return;
         menu.addItem((item) => {
-          item.setTitle(`让${this.who}听听这段`).setIcon("audio-lines").onClick(() => void this.review("selection"));
+          item.setTitle(`让${this.who}听听这段`).setIcon("audio-lines").onClick(() => {
+            this.review("selection").catch((error: unknown) => this.showFailure(error, "点评没有完成"));
+          });
         });
         menu.addItem((item) => {
-          item.setTitle(`向${this.who}请求帮忙润色`).setIcon("pencil").onClick(() => void this.polishSelection());
+          item.setTitle(`向${this.who}请求帮忙润色`).setIcon("pencil").onClick(() => {
+            this.polishSelection().catch((error: unknown) => this.showFailure(error, "润色没有完成"));
+          });
         });
         menu.addItem((item) => {
-          item.setTitle(`让${this.who}替我续写`).setIcon("pen-line").onClick(() => void this.continueWriting());
+          item.setTitle(`让${this.who}替我续写`).setIcon("pen-line").onClick(() => {
+            this.continueWriting().catch((error: unknown) => this.showFailure(error, "续写没有完成"));
+          });
         });
       }),
     );
@@ -98,13 +125,21 @@ export default class LinxuePlugin extends Plugin {
 
     this.statusBar = this.addStatusBarItem();
     this.statusBar.setText(`${this.who} · ${MODE_LABEL[this.settings.mode]}`);
-    this.statusBar.addEventListener("click", () => void this.activateView());
-    this.autoTimer = window.setInterval(() => void this.autoReview(), 30_000);
-    this.register(() => window.clearInterval(this.autoTimer));
+    this.registerDomEvent(this.statusBar, "click", () => {
+      this.activateView().catch((error: unknown) => this.showFailure(error, "面板没有打开"));
+    });
+    this.autoTimer = window.setInterval(() => {
+      this.autoReview().catch((error: unknown) => this.showFailure(error, "自动点评失败"));
+    }, 30_000);
+    this.registerInterval(this.autoTimer);
 
     if (!this.settings.textApiKey.trim()) {
       this.app.workspace.onLayoutReady(() => this.openSettings());
     }
+  }
+
+  private showFailure(error: unknown, fallback: string): void {
+    new Notice(error instanceof Error ? error.message : fallback);
   }
 
   openSettings(): void {
@@ -117,11 +152,24 @@ export default class LinxuePlugin extends Plugin {
     this.speaker.stop();
   }
 
+  private async cycleIdentity(): Promise<void> {
+    const next: IdentityId = this.settings.identity === "programmer" ? "editor" : "programmer";
+    const stored = next === "programmer" ? this.settings.programmerPersona : this.settings.editorPersona;
+    const fallback = next === "programmer" ? DEFAULT_PROGRAMMER_PERSONA : DEFAULT_PERSONA;
+    this.settings.identity = next;
+    this.settings.persona = stored.trim() ? stored : fallback;
+    if (next === "programmer") this.settings.programmerPersona = this.settings.persona;
+    else this.settings.editorPersona = this.settings.persona;
+    await this.saveSettings();
+    const label = next === "programmer" ? "程序员" : "小说编辑";
+    new Notice(`${this.who}换成了${label}`);
+    this.view()?.setStatus(`${this.who}现在是${label}。`);
+  }
+
   async loadSettings(): Promise<void> {
     const stored = (await this.loadData()) as Partial<LinxueSettings> | null;
     this.settings = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
-    if (!this.settings.persona?.trim()) this.settings.persona = DEFAULT_SETTINGS.persona;
-    if (!this.settings.aiName?.trim()) this.settings.aiName = DEFAULT_SETTINGS.aiName;
+    normalizeIdentity(this.settings);
     const adapter = this.app.vault.adapter;
     if (await adapter.exists(this.historyPath())) {
       this.records = parseHistory(await adapter.read(this.historyPath()));
@@ -170,7 +218,7 @@ export default class LinxuePlugin extends Plugin {
   }
 
   async saveSettings(): Promise<void> {
-    if (!this.settings.aiName.trim()) this.settings.aiName = DEFAULT_SETTINGS.aiName;
+    normalizeIdentity(this.settings);
     await this.saveData(this.settings);
     this.applyName();
   }
@@ -181,7 +229,9 @@ export default class LinxuePlugin extends Plugin {
     const panel = this.view();
     panel?.setMode(this.settings.mode);
     panel?.refreshName();
-    if (panel && panel.getDisplayText() !== this.who) void this.reopenPanel();
+    if (panel && panel.getDisplayText() !== this.who) {
+      this.reopenPanel().catch((error: unknown) => this.showFailure(error, "面板没有刷新"));
+    }
   }
 
   private async reopenPanel(): Promise<void> {
@@ -263,7 +313,7 @@ export default class LinxuePlugin extends Plugin {
     await this.activateView();
     const panel = this.view();
     panel?.setStatus(`正在点评《${doc.title}》，请稍等`);
-    panel?.setTranscript("");
+    panel?.clearTranscript();
 
     try {
       const reply = await requestReview(this.settings, doc);
@@ -506,7 +556,7 @@ export default class LinxuePlugin extends Plugin {
     await this.activateView();
     const panel = this.view();
     panel?.setStatus(`正在看最近新写的《${doc.title}》`);
-    panel?.setTranscript("");
+    panel?.clearTranscript();
     try {
       const reply = await requestReview(this.settings, doc);
       if (id !== this.job) return;

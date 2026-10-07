@@ -255,7 +255,7 @@ export function toSpeechText(source: string): string {
 
 export function chunkForSpeech(text: string, size: number): string[] {
   const limit = Math.max(80, size);
-  const pieces = text.split(/(?<=[。！？!?；;\n])/u);
+  const pieces = splitAfterMarks(text);
   const chunks: string[] = [];
   let buffer = "";
   const pushBuffer = () => {
@@ -270,6 +270,19 @@ export function chunkForSpeech(text: string, size: number): string[] {
   }
   pushBuffer();
   return chunks.length > 0 ? chunks : [text.trim()].filter(Boolean);
+}
+
+function splitAfterMarks(text: string): string[] {
+  const marks = new Set(["。", "！", "？", "!", "?", "；", ";", "\n"]);
+  const pieces: string[] = [];
+  let start = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    if (!marks.has(text[index])) continue;
+    pieces.push(text.slice(start, index + 1));
+    start = index + 1;
+  }
+  if (start < text.length) pieces.push(text.slice(start));
+  return pieces;
 }
 
 function hardSplit(text: string, limit: number): string[] {

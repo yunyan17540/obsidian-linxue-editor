@@ -82,3 +82,7 @@
 .linxue-save-status {
   color: var(--text-muted);
 }
+
+.linxue-wide-input {
+  width: 100%;
+}

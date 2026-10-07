@@ -52,7 +52,9 @@ export class Speaker {
       this.cancel = settleQuietly;
       audio.addEventListener("ended", onEnd);
       audio.addEventListener("error", onError);
-      void audio.play().catch((error: unknown) => {
+      audio.play().then(() => {
+        return;
+      }, (error: unknown) => {
         if (settled) return;
         settled = true;
         cleanup();

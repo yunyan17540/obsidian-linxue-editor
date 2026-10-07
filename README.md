@@ -20,7 +20,7 @@ npm test
 npm run build
 ```
 
-也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.2.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
+也可以从 [Releases](https://github.com/yunyan17540/obsidian-linxue-editor/releases) 下载 `linxue-editor-0.1.3.zip`，解压到库的 `.obsidian/plugins/linxue-editor/`。压缩包里只有这三个文件：
 
 - `main.js`
 - `manifest.json`
@@ -60,7 +60,11 @@ npm run build
 
 更新插件文件后，在命令面板运行「重新加载陪写插件」。Obsidian 的 `Ctrl+R` 会走编辑器快捷键，不会重新加载插件。
 
-温度填 `0` 时按模式自动选择：话痨 0.9，中庸 0.7，淑女安静 0.45。人设提示词可以改，恢复默认会回到原稿。模式说明和当前名字由插件附加在人设后面。
+温度填 `0` 时按模式自动选择：话痨 0.9，中庸 0.7，淑女安静 0.45。
+
+「AI人设」里可以填写她怎么称呼你、她自己的背景经历，以及你们两人的故事。称呼留空时用「你」。经历和故事留空时，沿用当前身份原稿。填写后会附加到点评、润色、续写和卡文问候里；故事若和原稿冲突，以你填写的为准。
+
+身份可以在「小说编辑」和「程序员」之间切换。两边各自保存系统提示词，切换不会清掉称呼、经历和故事。命令「切换身份」做同一件事。「恢复当前身份」只恢复正在使用的那一份原稿。
 
 ## 使用
 

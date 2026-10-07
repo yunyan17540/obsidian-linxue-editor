@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { bailianAudioUrl, bailianSpeechUrl, voicesForModel } from "../src/bailian.ts";
+import { buildIdentityPrompt } from "../src/persona.ts";
 import {
   buildReviewDocument,
   chunkForSpeech,
@@ -110,6 +111,21 @@ test("bailian speech uses the synthesizer path and published voices", () => {
   assert.ok(voicesForModel("qwen-audio-3.1-tts-flash").some((voice) => voice.id === "longanhuan_v3.1"));
   assert.equal(voicesForModel("qwen-audio-3.1-realtime-plus").length, 0);
   assert.equal(bailianAudioUrl({ output: { audio: { url: "https://example.com/a.mp3" } } }), "https://example.com/a.mp3");
+});
+
+test("identity prompt keeps the chosen name, address, and shared story", () => {
+  const prompt = buildIdentityPrompt({
+    name: "阿雪",
+    userAddress: "阿年",
+    background: "后来去写程序了。",
+    sharedStory: "我们一起改过第一篇稿。",
+    persona: "你的名字是林雪。你是编辑。",
+  });
+  assert.match(prompt, /你的名字是阿雪/);
+  assert.match(prompt, /称呼对方为「阿年」/);
+  assert.match(prompt, /后来去写程序了/);
+  assert.match(prompt, /以这段为准/);
+  assert.match(prompt, /你是编辑/);
 });
 
 test("added text ignores unchanged surroundings", () => {
